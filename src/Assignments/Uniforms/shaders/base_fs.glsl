@@ -1,13 +1,15 @@
-#version 410
+#version 460
 
 layout(location=0) out vec4 vFragColor;
+
+in vec3 in_color;
+
 layout(std140, binding = 0) uniform Modifier {
     float strength;
-    vec3  color; 
+    vec3  color;
 };
 
-in vec4 Color;
-
 void main() {
-    vFragColor = Color;
+    vec3 out_color = in_color * color * strength;
+    vFragColor = vec4(out_color, 1.0f);
 }
