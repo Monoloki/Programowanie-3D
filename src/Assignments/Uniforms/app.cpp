@@ -80,7 +80,6 @@ void SimpleShapeApplication::init() {
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBindBufferBase(GL_UNIFORM_BUFFER, 1, u_vertex_buffer_handle);
     
-
     // This setups a Vertex Array Object (VAO) that  encapsulates
     // the state of all vertex buffers needed for rendering
     glGenVertexArrays(1, &vao_);
@@ -97,32 +96,32 @@ void SimpleShapeApplication::init() {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
     glEnableVertexAttribArray(1);
 
-    {
-        float strength = 0.8f;
-        float color[3] = { 0.9f, 0.9f, 0.0f };
-
-        glBindBuffer(GL_UNIFORM_BUFFER, u_fragment_buffer_handle);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float), &strength);
-        glBufferSubData(GL_UNIFORM_BUFFER, 4 * sizeof(float), 3 * sizeof(float), color);
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    }
     
-    {
-        float theta = 1.0 * glm::pi<float>() / 6.0f;
-        auto cs = std::cos(theta);
-        auto ss = std::sin(theta);
-        glm::mat2 rot{ cs,ss,-ss,cs };
-        glm::vec2 trans{ 0.0,  -0.25 };
-        glm::vec2 scale{ 0.5, 0.5 };
+    float strength = 0.8f;
+    float color[3] = { 0.9f, 0.9f, 0.0f };
 
-        glBindBuffer(GL_UNIFORM_BUFFER, u_vertex_buffer_handle);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec2), value_ptr(scale));
-        glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(float), sizeof(glm::vec2), value_ptr(trans));
-        glBufferSubData(GL_UNIFORM_BUFFER, 4 * sizeof(float), sizeof(glm::mat2), value_ptr(rot));
-        glBufferSubData(GL_UNIFORM_BUFFER, 6 * sizeof(float), sizeof(glm::mat2), value_ptr(rot));
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    glBindBuffer(GL_UNIFORM_BUFFER, u_fragment_buffer_handle);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float), &strength);
+    glBufferSubData(GL_UNIFORM_BUFFER, 4 * sizeof(float), 3 * sizeof(float), color);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    
+    
+    
+    float theta = 1.0 * glm::pi<float>() / 6.0f;
+    auto cs = std::cos(theta);
+    auto ss = std::sin(theta);
+    glm::mat2 rot{ cs,ss,-ss,cs };
+    glm::vec2 trans{ 0.0,  -0.25 };
+    glm::vec2 scale{ 0.5, 0.5 };
 
-    }
+    glBindBuffer(GL_UNIFORM_BUFFER, u_vertex_buffer_handle);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec2), value_ptr(scale));
+    glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(float), sizeof(glm::vec2), value_ptr(trans));
+    glBufferSubData(GL_UNIFORM_BUFFER, 4 * sizeof(float), sizeof(glm::mat2), value_ptr(rot));
+    glBufferSubData(GL_UNIFORM_BUFFER, 6 * sizeof(float), sizeof(glm::mat2), value_ptr(rot));
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
