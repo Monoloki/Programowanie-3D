@@ -1,4 +1,5 @@
 #include "app.h"
+
 #include <iostream>
 #include <vector>
 #include <tuple>
@@ -21,6 +22,7 @@ void SimpleShapeApplication::init() {
         std::cerr << "Invalid program" << std::endl;
         exit(-1);
     }
+
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -101,6 +103,7 @@ void SimpleShapeApplication::init() {
         glm::vec3(2.0f, -1.0f, 2.0f),
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
+
 
     //matrix model
     glm::mat4 model = glm::mat4(1.0f);
