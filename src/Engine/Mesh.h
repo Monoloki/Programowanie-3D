@@ -35,7 +35,7 @@ namespace xe {
 
         void vertex_attrib_pointer(GLuint index, GLuint size, GLenum type, GLsizei stride, GLsizei offset);
 
-        void add_submesh(GLuint start, GLuint end, Material* mat) {
+        void add_submesh(GLuint start, GLuint end, Material* mat = nullptr) {
             submeshes_.push_back({start, end});
             materials_.push_back(mat);
         }

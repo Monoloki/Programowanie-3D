@@ -11,6 +11,7 @@
 #include "Application/utils.h"
 
 #include "glad/gl.h"
+#include "glm/glm.hpp"
 #include "camera.h"
 #include "CameraController.h"
 #include "Engine/Mesh.h"
@@ -42,7 +43,7 @@ public:
     }
 
 private:
-    GLuint vao_, u_vertex_buffer_handle, v_buffer_handle, u_fragment_buffer_handle;
+    GLuint  v_buffer_handle;
     Camera *camera_;
     glm::mat4 modelMat;
     std::vector<GLushort> indices;
