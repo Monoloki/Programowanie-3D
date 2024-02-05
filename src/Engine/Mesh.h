@@ -44,6 +44,13 @@ namespace xe {
             add_submesh(start, end, nullptr);
         }
 
+
+        void *map_vertex_buffer();
+        void unmap_vertex_buffer();
+        void *map_index_buffer();
+        void unmap_index_buffer();
+
+
         void draw() const;
 
     private:

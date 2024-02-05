@@ -111,7 +111,7 @@ endif ()
 
 
 #Assignments
-set(ASSIGNMENTS Triangle House Colors Indices Uniforms PVM Pyramid Resizing Zoom CameraMovement Meshes Materials MeshesMaterials SceneGraph Textures Phong PBR MultipleLights NormalMaps)
+set(ASSIGNMENTS Triangle House Colors Indices Uniforms PVM Pyramid Resizing Zoom CameraMovement Meshes Materials MeshesMaterials SceneGraph Textures Phong PBR MultipleLights NormalMaps Textures2)
 
 set(ASSIGNMENTS_DIR ${SOURCE_DIR}/Assignments)
 link_libraries(application)
