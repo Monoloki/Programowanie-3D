@@ -4,22 +4,37 @@
 
 #include <iostream>
 
+
 #include "Mesh.h"
+
+#include "Material.h"
+
 
 void xe::Mesh::draw() const {
     glBindVertexArray(vao_);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, i_buffer_);
     for (auto i = 0; i < submeshes_.size(); i++) {
-        if (materials_[i] != nullptr) materials_[i]->bind();
-        glDrawElements(GL_TRIANGLES, submeshes_[i].count(), GL_UNSIGNED_SHORT,
-                       reinterpret_cast<void *>(sizeof(GLushort) * submeshes_[i].start));
-        if (materials_[i] != nullptr) materials_[i]->unbind();
+        auto sm = submeshes_[i];
+        auto mtl = materials_[i];
+        if (mtl != nullptr) {
+            mtl->bind();
+        }
+        if (sm.cull_face) {
+            glEnable(GL_CULL_FACE);
+        } else {
+            glDisable(GL_CULL_FACE);
+        }
+        glDrawElements(GL_TRIANGLES, sm.count(), GL_UNSIGNED_SHORT,
+                       reinterpret_cast<void *>(sizeof(GLushort) * sm.start));
+        if (mtl != nullptr) {
+            mtl->unbind();
+        }
     }
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0u);
     glBindVertexArray(0u);
 }
 
-void xe::Mesh::vertex_attrib_pointer(GLuint index, GLuint size, GLenum type, GLsizei stride, GLsizei offset) {
+void xe::Mesh::vertex_attrib_pointer(GLuint index, GLuint size, GLenum type, GLsizei stride, GLsizeiptr offset) {
     glBindVertexArray(vao_);
     glBindBuffer(GL_ARRAY_BUFFER, v_buffer_);
     glEnableVertexAttribArray(index);
@@ -45,8 +60,7 @@ void xe::Mesh::allocate_index_buffer(size_t size, GLenum hint) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0u);
 }
 
-void xe::Mesh::load_indices(size_t offset, size_t size, void *data) {
-
+void xe::Mesh::load_indices(size_t offset, size_t size, const void *data) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, i_buffer_);
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, size, data);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0u);
@@ -60,7 +74,7 @@ void xe::Mesh::allocate_vertex_buffer(size_t size, GLenum hint) {
 }
 
 void xe::Mesh::
-load_vertices(size_t offset, size_t size, void *data) {
+load_vertices(size_t offset, size_t size, const void *data) {
     glBindBuffer(GL_ARRAY_BUFFER, v_buffer_);
     glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
     glBindBuffer(GL_ARRAY_BUFFER, 0u);

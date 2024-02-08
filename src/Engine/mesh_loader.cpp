@@ -6,25 +6,25 @@
 
 #include <memory>
 
-#define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
 #include "ObjectReader/obj_reader.h"
-#include "Engine/Material.h"
-// #include "XeEngine/PhongMaterial.h"
+#include "Engine/ColorMaterial.h"
+#include "Engine/PhongMaterial.h"
 #include "Engine/Mesh.h"
+using namespace glm;
 
 
 namespace {
     xe::ColorMaterial *make_color_material(const xe::mtl_material_t &mat, std::string mtl_dir);
-    // xe::PhongMaterial *make_phong_material(const xe::mtl_material_t &mat, std::string mtl_dir);
+    xe::PhongMaterial *make_phong_material(const xe::mtl_material_t &mat, std::string mtl_dir);
 }
 
 namespace xe {
 
 
-    Mesh* load_mesh_from_obj(std::string path, std::string mtl_dir) {
+    std::shared_ptr<Mesh> load_mesh_from_obj(std::string path, std::string mtl_dir) {
 
         auto smesh = xe::load_smesh_from_obj(path, mtl_dir);
         if (smesh.vertex_coords.empty())
@@ -36,7 +36,7 @@ namespace xe {
         auto n_indices = 3 * smesh.faces.size();
 
 
-        glm::uint n_floats_per_vertex = 3;
+        uint n_floats_per_vertex = 3;
         for (auto &&t: smesh.has_texcoords) {
             if (t)
                 n_floats_per_vertex += 2;
@@ -83,6 +83,10 @@ namespace xe {
         }
         if (smesh.has_normals) {
             mesh->vertex_attrib_pointer(xe::sMesh::MAX_TEXCOORDS + 1, 3, GL_FLOAT, stride, offset);
+            auto v_offset = offset;
+            for (auto i = 0; i < smesh.vertex_normals.size(); i++, v_offset += stride) {
+                std::memcpy(v_ptr + v_offset, glm::value_ptr(smesh.vertex_normals[i]), sizeof(glm::vec3));
+            }
             offset += 3 * sizeof(GLfloat);
         }
 
@@ -103,16 +107,16 @@ namespace xe {
                     case 0:
                         material = make_color_material(mat, mtl_dir);
                         break;
-                    // case 1:
-                    //     material = make_phong_material(mat, mtl_dir);
-                    //     break;
+                    case 1:
+                        material = make_phong_material(mat, mtl_dir);
+                        break;
                 }
 
-                mesh->add_submesh(sm.start, sm.end, material);
+                mesh->add_submesh(sm.start, sm.end, material, false);
             }
 
         }
-        return mesh;
+        return std::shared_ptr<Mesh>(mesh);
 
 
     }
@@ -137,23 +141,30 @@ namespace xe {
             return material;
         }
 
-        // xe::PhongMaterial *make_phong_material(const xe::mtl_material_t &mat, std::string mtl_dir) {
+        xe::PhongMaterial *make_phong_material(const xe::mtl_material_t &mat, std::string mtl_dir) {
 
-        //     glm::vec4 color;
-        //     for (int i = 0; i < 3; i++)
-        //         color[i] = mat.diffuse[i];
-        //     color[3] = 1.0;
-        //     spdlog::debug("Adding ColorMaterial {}", glm::to_string(color));
-        //     auto material = new xe::PhongMaterial(color);
-        //     if (!mat.diffuse_texname.empty()) {
-        //         auto texture = xe::create_texture(mtl_dir + "/" + mat.diffuse_texname);
-        //         spdlog::debug("Adding Texture {} {:1d}", mat.diffuse_texname, texture);
-        //         if (texture > 0) {
-        //             material->set_texture(texture);
-        //         }
-        //     }
+            glm::vec4 color;
+            for (int i = 0; i < 3; i++)
+                color[i] = mat.diffuse[i];
+            color[3] = 1.0;
+            glm::vec3 specular;
+            for(int i = 0; i < 3; i++) {
+                specular[i] = mat.specular[i];
+            }
+            glm::vec3 ambient;
+            for(int i = 0; i < 3; i++) {
+                ambient[i] = mat.ambient[i];
+            }
+            float specularStrength = mat.shininess;
+            auto material = new xe::PhongMaterial(color, ambient, specular, specularStrength);
+            if (!mat.diffuse_texname.empty()) {
+                auto texture = xe::create_texture(mtl_dir + "/" + mat.diffuse_texname);
+                if (texture > 0) {
+                    material->set_texture(texture);
+                }
+            }
 
-        //     return material;
-        // }
+            return material;
+        }
 
     }
